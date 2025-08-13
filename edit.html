@@ -1,37 +1,38 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>编辑外太空导航</title>
-    <link rel="icon" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMiAwYzYuNjI3IDAgMTIgNS4zNzMgMTIgMTJzLTUuMzczIDEyLTEyIDEyUzAgMTguNjI3IDAgMTJTMi4zNzMgMCAxMiAwem0wIDMuNzVjLTMuMjA4IDAtNS44MjUgMi42MTctNS44MjUgNS44MjVzMi42MTcgNS44MjUgNS44MjUgNS44MjUgNS44MjUtMi42MTcgNS44MjUtNS44MjVTMTEuMjA4IDMuNzUgNiAzLjc1em0wIDUuMjUgMS4yNSAwIDAgNi4yNUg2LjI1TDYuMjUgOS43NUwxMiA0Ljc1bDUuNzUgNS4xbDIuNS0yLjUgMC02LjI1aDEuMjV6IiBmaWxsPSIjMDBGRkZGIi8+PC9zdmc+" type="image/svg+xml">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="password-prompt">
-        <input type="password" id="password" placeholder="输入密码进入编辑">
+    <div id="passwordModal">
+        <input type="password" id="passwordInput" placeholder="输入密码">
         <button onclick="checkPassword()">进入</button>
     </div>
-    <div id="edit-content" style="display:none;">
+
+    <div id="editContent" style="display:none;">
         <h1>编辑书签和广告</h1>
-        <!-- 导入/导出 -->
-        <input type="file" id="import-file" accept=".html">
+        <input type="file" id="importFile" accept=".html">
         <button onclick="importBookmarks()">导入浏览器书签</button>
         <button onclick="exportBookmarks()">导出书签</button>
 
-        <!-- 书签列表：人性化操作 -->
-        <div id="edit-bookmarks"></div>
-        <!-- 添加新书签 -->
-        <input id="new-url" placeholder="新网址">
-        <input id="new-title" placeholder="标题">
+        <div id="bookmarkEditor">
+            <!-- 书签列表，动态生成 -->
+        </div>
+
+        <h2>添加新书签</h2>
+        <input type="text" id="newTitle" placeholder="标题">
+        <input type="text" id="newUrl" placeholder="URL">
         <button onclick="addBookmark()">添加</button>
 
-        <!-- 广告编辑：固定尺寸300x100 -->
-        <h2>编辑广告（固定尺寸300x100）</h2>
-        <div>广告1: <input id="ad1-url" placeholder="图片URL"> <input id="ad1-link-url" placeholder="链接"> <button onclick="saveAd(1)">保存</button></div>
-        <div>广告2: <input id="ad2-url" placeholder="图片URL"> <input id="ad2-link-url" placeholder="链接"> <button onclick="saveAd(2)">保存</button></div>
-        <div>广告3: <input id="ad3-url" placeholder="图片URL"> <input id="ad3-link-url" placeholder="链接"> <button onclick="saveAd(3)">保存</button></div>
+        <h2>编辑广告（固定300x100）</h2>
+        <div>广告1: <input type="text" id="ad1Img" placeholder="图片URL"> <input type="text" id="ad1Link" placeholder="链接"> <button onclick="saveAd(1)">保存</button></div>
+        <div>广告2: <input type="text" id="ad2Img" placeholder="图片URL"> <input type="text" id="ad2Link" placeholder="链接"> <button onclick="saveAd(2)">保存</button></div>
+        <div>广告3: <input type="text" id="ad3Img" placeholder="图片URL"> <input type="text" id="ad3Link" placeholder="链接"> <button onclick="saveAd(3)">保存</button></div>
     </div>
 </body>
 </html>
