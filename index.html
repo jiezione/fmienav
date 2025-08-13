@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>外太空导航</title>
+    <!-- 特色网页标签：宇宙飞船图标 -->
+    <link rel="icon" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMiAwYzYuNjI3IDAgMTIgNS4zNzMgMTIgMTJzLTUuMzczIDEyLTEyIDEyUzAgMTguNjI3IDAgMTJTMi4zNzMgMCAxMiAwem0wIDMuNzVjLTMuMjA4IDAtNS44MjUgMi42MTctNS44MjUgNS44MjVzMi42MTcgNS44MjUgNS44MjUgNS44MjUgNS44MjUtMi42MTcgNS44MjUtNS44MjVTMTEuMjA4IDMuNzUgNiAzLjc1em0wIDUuMjUgMS4yNSAwIDAgNi4yNUg2LjI1TDYuMjUgOS43NUwxMiA0Ljc1bDUuNzUgNS4xbDIuNS0yLjUgMC02LjI1aDEuMjV6IiBmaWxsPSIjMDBGRkZGIi8+PC9zdmc+" type="image/svg+xml">
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body class="day-mode"> <!-- 默认白天模式 -->
+    <!-- 模式切换按钮：小轮廓图标，鼠标移入显示“切换模式”，滚动显示/隐藏 -->
+    <button id="mode-toggle" title="切换模式">☀️/🌙</button>
+
+    <!-- 顶部小组件横排 -->
+    <div class="widgets">
+        <div id="uptime">运行时长: 0天</div>
+        <div id="health-reminder">健康提醒: 休息一下吧！</div>
+        <div id="calendar">日历: 加载中...</div>
+        <div id="world-time">世界时间: <select id="time-zone">
+            <option value="Asia/Shanghai">北京</option>
+            <option value="America/New_York">纽约</option>
+            <option value="Europe/London">伦敦</option>
+        </select> <span id="time-display">加载中...</span></div>
+    </div>
+
+    <!-- 收藏夹展示：小标签+标题排列 -->
+    <div id="bookmarks" class="bookmarks"></div>
+
+    <!-- 3个横向图片广告位（固定位置，编辑页面可改） -->
+    <div class="ads">
+        <a href="#" id="ad1-link"><img id="ad1-img" src="https://via.placeholder.com/300x100?text=广告1" alt="广告1"></a>
+        <a href="#" id="ad2-link"><img id="ad2-img" src="https://via.placeholder.com/300x100?text=广告2" alt="广告2"></a>
+        <a href="#" id="ad3-link"><img id="ad3-img" src="https://via.placeholder.com/300x100?text=广告3" alt="广告3"></a>
+    </div>
+
+    <!-- 底部 -->
+    <div class="dark-white">
+        <div>共收录<span id="total-sites">0</span>个网站</div>
+        <div>Copyright © 2018-<span id="current-year"></span> yourdomain.com, All Rights Reserved</div>
+    </div>
+</body>
+</html>
