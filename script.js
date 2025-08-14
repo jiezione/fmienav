@@ -1,297 +1,271 @@
-body {
-    font-family: 'Orbitron', sans-serif;
-    margin: 0;
-    padding: 0;
-    background: linear-gradient(135deg, #1a0033, #330066, #4d0099);
-    color: #e6e6ff;
-    position: relative;
-    min-height: 100vh;
-    overflow-x: hidden;
+const modeSwitch = document.getElementById('modeSwitch');
+const editButton = document.getElementById('editButton');
+let timeout;
+
+function toggleModeSwitch() {
+    modeSwitch.classList.remove('hidden');
+    editButton.classList.remove('hidden');
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+        modeSwitch.classList.add('hidden');
+        editButton.classList.add('hidden');
+    }, 3000);
 }
 
-.day-mode {
-    background: linear-gradient(135deg, #66ccff, #3399ff, #0066cc);
-    color: #000033;
+if (modeSwitch) {
+    modeSwitch.addEventListener('click', () => {
+        document.body.classList.toggle('day-mode');
+        modeSwitch.querySelector('.icon').textContent = document.body.classList.contains('day-mode') ? '🌙' : '☀️';
+    });
+    window.addEventListener('scroll', toggleModeSwitch);
+    window.addEventListener('mousemove', toggleModeSwitch);
 }
 
-#stars {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    pointer-events: none;
+if (editButton) {
+    editButton.addEventListener('click', () => {
+        document.getElementById('passwordModal').style.display = 'block';
+    });
 }
 
-.mode-switch, .edit-button {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    cursor: pointer;
-    opacity: 1;
-    transition: opacity 0.5s, transform 0.3s, box-shadow 0.3s;
-    z-index: 1000;
-    padding: 8px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.1);
-    box-shadow: 0 0 10px rgba(153,204,255,0.5);
+function checkPassword() {
+    if (document.getElementById('passwordInput').value === '123456') {
+        window.location.href = 'edit.html';
+    } else {
+        alert('密码错误');
+    }
 }
 
-.edit-button {
-    right: 60px;
+const canvas = document.getElementById('stars');
+if (canvas) {
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let particles = [];
+    for (let i = 0; i < 200; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 2 + 1,
+            speed: Math.random() * 0.5 + 0.1,
+            isMeteor: Math.random() < 0.1
+        });
+    }
+    function drawStars() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.strokeStyle = '#fff';
+        particles.forEach(p => {
+            ctx.beginPath();
+            if (p.isMeteor) {
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x - 20, p.y - 20);
+                ctx.stroke();
+                p.x += 2;
+                p.y += 2;
+                if (p.x > canvas.width || p.y > canvas.height) {
+                    p.x = Math.random() * canvas.width;
+                    p.y = -20;
+                }
+            } else {
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+                p.y += p.speed;
+                if (p.y > canvas.height) p.y = 0;
+            }
+        });
+        requestAnimationFrame(drawStars);
+    }
+    drawStars();
 }
 
-.mode-switch.hidden, .edit-button.hidden {
-    opacity: 0;
+function updateWidgets() {
+    const startDate = new Date('2025-08-14');
+    const days = Math.floor((new Date() - startDate) / (1000 * 60 * 60 * 24));
+    document.getElementById('uptime').textContent = `运行时长: ${days}天`;
+
+    const hour = new Date().getHours();
+    const tip = hour % 2 === 0 ? '健康提醒: 喝杯水' : '健康提醒: 休息眼睛';
+    document.getElementById('healthTip').textContent = tip;
+
+    const date = new Date().toLocaleDateString('zh-CN');
+    document.getElementById('calendar').textContent = `日历: ${date}`;
+
+    updateTime();
+    setInterval(updateTime, 1000);
+}
+function updateTime() {
+    const tz = document.getElementById('timeZone').value;
+    const time = new Date().toLocaleTimeString('zh-CN', { timeZone: tz });
+    document.getElementById('worldTime').firstChild.textContent = `世界时间: ${tz.split('/')[1]} - ${time}`;
+}
+if (document.getElementById('uptime')) updateWidgets();
+
+let bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+let ads = JSON.parse(localStorage.getItem('ads')) || [{img:'',link:''}, {img:'',link:''}, {img:'',link:''}];
+
+function renderBookmarks() {
+    const container = document.getElementById('bookmarks');
+    if (!container) return;
+    container.innerHTML = '';
+    const folders = {};
+    bookmarks.forEach(bm => {
+        const folder = bm.folder || '默认';
+        if (!folders[folder]) folders[folder] = [];
+        folders[folder].push(bm);
+    });
+    for (let folder in folders) {
+        const folderDiv = document.createElement('div');
+        folderDiv.className = 'bookmark-folder';
+        folderDiv.innerHTML = `<h3>${folder}</h3>`;
+        const grid = document.createElement('div');
+        grid.className = 'bookmarks';
+        folders[folder].forEach(bm => {
+            const div = document.createElement('div');
+            div.className = 'bookmark';
+            div.innerHTML = `<img src="https://www.google.com/s2/favicons?domain=${bm.url}" alt="${bm.title}"><br><a href="${bm.url}" target="_blank">${bm.title}</a>`;
+            grid.appendChild(div);
+        });
+        folderDiv.appendChild(grid);
+        container.appendChild(folderDiv);
+    }
+    document.getElementById('totalSites').textContent = bookmarks.length;
+}
+function renderAds() {
+    for (let i = 1; i <= 3; i++) {
+        const ad = document.getElementById(`ad${i}`);
+        ad.querySelector('img').src = ads[i-1].img || 'https://via.placeholder.com/300x100';
+        ad.querySelector('a').href = ads[i-1].link || '#';
+    }
+}
+if (document.getElementById('bookmarks')) {
+    renderBookmarks();
+    renderAds();
 }
 
-.mode-switch:hover, .edit-button:hover {
-    transform: scale(1.2);
-    box-shadow: 0 0 20px rgba(153,204,255,1);
-    animation: pulse 1s infinite;
+function renderEditor() {
+    const editor = document.getElementById('bookmarkEditor');
+    editor.innerHTML = '';
+    bookmarks.forEach((bm, idx) => {
+        const div = document.createElement('div');
+        div.className = 'bookmark-item';
+        div.dataset.idx = idx;
+        div.draggable = true;
+        div.innerHTML = `${bm.title} - ${bm.url} (文件夹: ${bm.folder || '默认'}) <button onclick="editBookmark(${idx})">编辑</button> <button onclick="deleteBookmark(${idx})">删除</button>`;
+        editor.appendChild(div);
+    });
+}
+function addBookmark() {
+    const title = document.getElementById('newTitle').value;
+    const url = document.getElementById('newUrl').value;
+    const folder = document.getElementById('newFolder').value || '默认';
+    if (title && url && !bookmarks.some(b => b.url === url)) {
+        bookmarks.push({title, url, folder});
+        saveBookmarks();
+        renderEditor();
+    }
+}
+function editBookmark(idx) {
+    const newTitle = prompt('新标题', bookmarks[idx].title);
+    const newUrl = prompt('新URL', bookmarks[idx].url);
+    const newFolder = prompt('新文件夹', bookmarks[idx].folder || '默认');
+    if (newTitle && newUrl) {
+        bookmarks[idx] = {title: newTitle, url: newUrl, folder: newFolder};
+        saveBookmarks();
+        renderEditor();
+    }
+}
+function deleteBookmark(idx) {
+    bookmarks.splice(idx, 1);
+    saveBookmarks();
+    renderEditor();
+}
+function saveBookmarks() {
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    if (document.getElementById('bookmarks')) renderBookmarks();
+}
+function importBookmarks() {
+    const file = document.getElementById('importFile').files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(e.target.result, 'text/html');
+        let currentFolder = '默认';
+        const walk = (node, folder) => {
+            if (node.tagName === 'H3') currentFolder = node.textContent;
+            if (node.tagName === 'A') {
+                const url = node.href;
+                const title = node.textContent;
+                if (url && title && !bookmarks.some(b => b.url === url)) {
+                    bookmarks.push({title, url, folder});
+                }
+            }
+            node.childNodes.forEach(child => walk(child, currentFolder));
+        };
+        doc.querySelectorAll('dl').forEach(dl => walk(dl, currentFolder));
+        saveBookmarks();
+        renderEditor();
+        alert('导入完成，重复忽略');
+    };
+    reader.readAsText(file);
+}
+function exportBookmarks() {
+    let html = '<DL><p>';
+    const folders = {};
+    bookmarks.forEach(bm => {
+        const folder = bm.folder || '默认';
+        if (!folders[folder]) folders[folder] = [];
+        folders[folder].push(bm);
+    });
+    for (let folder in folders) {
+        html += `<DT><H3>${folder}</H3><DL><p>`;
+        folders[folder].forEach(bm => {
+            html += `<DT><A HREF="${bm.url}">${bm.title}</A></DT>`;
+        });
+        html += '</DL><p>';
+    }
+    html += '</DL><p>';
+    const blob = new Blob([html], {type: 'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'bookmarks.html';
+    a.click();
+}
+function saveAd(num) {
+    const img = document.getElementById(`ad${num}Img`).value;
+    const link = document.getElementById(`ad${num}Link`).value;
+    ads[num-1] = {img, link};
+    localStorage.setItem('ads', JSON.stringify(ads));
+    if (document.getElementById('bookmarks')) renderAds();
+}
+function loadAdsToEditor() {
+    for (let i = 1; i <= 3; i++) {
+        document.getElementById(`ad${i}Img`).value = ads[i-1].img;
+        document.getElementById(`ad${i}Link`).value = ads[i-1].link;
+    }
+}
+if (document.getElementById('bookmarkEditor')) {
+    renderEditor();
+    loadAdsToEditor();
 }
 
-.icon {
-    font-size: 24px;
-    transition: transform 0.3s;
-}
-
-.tooltip {
-    display: none;
-    position: absolute;
-    top: 40px;
-    background: rgba(0,0,0,0.8);
-    color: #e6e6ff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 14px;
-    white-space: nowrap;
-    z-index: 1001;
-}
-
-.mode-switch:hover .tooltip, .edit-button:hover .tooltip {
-    display: block;
-}
-
-.password-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.9);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(153,204,255,0.7);
-    z-index: 2000;
-    backdrop-filter: blur(5px);
-}
-
-.password-modal input {
-    padding: 10px;
-    margin-right: 10px;
-    border-radius: 5px;
-    border: none;
-    background: rgba(255,255,255,0.1);
-    color: #e6e6ff;
-}
-
-.password-modal button {
-    padding: 10px 20px;
-    background: #3399ff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.password-modal button:hover {
-    background: #66ccff;
-}
-
-.header {
-    display: flex;
-    justify-content: center;
-    padding: 20px;
-    background: rgba(0,0,0,0.4);
-    backdrop-filter: blur(3px);
-}
-
-.widgets {
-    display: flex;
-    gap: 15px;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.widgets div {
-    background: rgba(255,255,255,0.1);
-    padding: 10px 15px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(153,204,255,0.3);
-    transition: transform 0.3s;
-}
-
-.widgets div:hover {
-    transform: translateY(-3px);
-}
-
-.bookmarks {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
-    padding: 30px;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.bookmark-folder {
-    background: rgba(255,255,255,0.05);
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    box-shadow: 0 0 15px rgba(153,204,255,0.2);
-}
-
-.bookmark-folder h3 {
-    margin: 0 0 15px;
-    font-size: 20px;
-    color: #66ccff;
-    text-shadow: 0 0 5px rgba(102,204,255,0.5);
-}
-
-.bookmark {
-    text-align: center;
-    background: rgba(255,255,255,0.1);
-    padding: 20px;
-    border-radius: 10px;
-    transition: transform 0.3s, box-shadow 0.3s;
-    backdrop-filter: blur(5px);
-}
-
-.bookmark:hover {
-    transform: translateY(-5px) rotateX(5deg);
-    box-shadow: 0 0 20px rgba(153,204,255,0.7);
-}
-
-.bookmark img {
-    width: 40px;
-    height: 40px;
-    margin-bottom: 8px;
-}
-
-.bookmark a {
-    color: inherit;
-    text-decoration: none;
-    font-size: 16px;
-    text-shadow: 0 0 3px rgba(255,255,255,0.5);
-}
-
-.ads {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    padding: 30px;
-    flex-wrap: wrap;
-}
-
-.ad img {
-    width: 300px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(153,204,255,0.3);
-    transition: transform 0.3s;
-}
-
-.ad img:hover {
-    transform: scale(1.05);
-}
-
-.footer {
-    text-align: center;
-    padding: 20px;
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(3px);
-    position: relative;
-    bottom: 0;
-    width: 100%;
-}
-
-#editContent {
-    max-width: 900px;
-    margin: 30px auto;
-    padding: 20px;
-    background: rgba(0,0,0,0.4);
-    border-radius: 15px;
-    backdrop-filter: blur(5px);
-}
-
-#editContent h1, #editContent h2 {
-    color: #66ccff;
-    text-shadow: 0 0 5px rgba(102,204,255,0.5);
-}
-
-#bookmarkEditor {
-    margin: 20px 0;
-}
-
-.bookmark-item {
-    background: rgba(255,255,255,0.1);
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: transform 0.3s;
-}
-
-.bookmark-item:hover {
-    transform: translateY(-3px);
-}
-
-.bookmark-item button {
-    padding: 8px 15px;
-    background: #3399ff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 10px;
-    transition: background 0.3s;
-}
-
-.bookmark-item button:hover {
-    background: #66ccff;
-}
-
-#editContent input {
-    padding: 10px;
-    margin: 5px;
-    border-radius: 5px;
-    border: none;
-    background: rgba(255,255,255,0.1);
-    color: #e6e6ff;
-}
-
-#editContent button {
-    padding: 10px 20px;
-    background: #3399ff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-#editContent button:hover {
-    background: #66ccff;
-}
-
-@keyframes pulse {
-    0% { box-shadow: 0 0 10px rgba(153,204,255,0.5); }
-    50% { box-shadow: 0 0 20px rgba(153,204,255,1); }
-    100% { box-shadow: 0 0 10px rgba(153,204,255,0.5); }
+const editor = document.getElementById('bookmarkEditor');
+if (editor) {
+    editor.addEventListener('dragstart', e => {
+        if (e.target.classList.contains('bookmark-item')) {
+            e.dataTransfer.setData('text', e.target.dataset.idx);
+        }
+    });
+    editor.addEventListener('dragover', e => e.preventDefault());
+    editor.addEventListener('drop', e => {
+        if (e.target.classList.contains('bookmark-item')) {
+            const fromIdx = e.dataTransfer.getData('text');
+            const toIdx = e.target.dataset.idx;
+            if (fromIdx !== toIdx) {
+                [bookmarks[fromIdx], bookmarks[toIdx]] = [bookmarks[toIdx], bookmarks[fromIdx]];
+                saveBookmarks();
+                renderEditor();
+            }
+        }
+    });
 }
