@@ -4,14 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>外太空导航</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon"> <!-- 特色外太空网页标签图标 -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
-<body class="day-mode"> <!-- 默认白天模式 -->
+<body class="day-mode">
     <div class="mode-switch" id="modeSwitch">
-        <span class="icon">☀️</span> <!-- 小轮廓图标 -->
+        <span class="icon">☀️</span>
         <span class="tooltip">切换白天/黑夜模式</span>
+    </div>
+    <div class="edit-button" id="editButton">
+        <span class="icon">⚙️</span>
+        <span class="tooltip">进入编辑页面</span>
+    </div>
+    <div class="password-modal" id="passwordModal" style="display:none;">
+        <input type="password" id="passwordInput" placeholder="输入密码">
+        <button onclick="checkPassword()">进入</button>
     </div>
 
     <div class="header">
@@ -30,12 +38,12 @@
         </div>
     </div>
 
-    <div class="bookmarks" id="bookmarks"></div> <!-- 收藏夹展示 -->
+    <div class="bookmarks" id="bookmarks"></div>
 
     <div class="ads">
-        <div class="ad" id="ad1"><img src="" alt="广告1"><a href=""></a></div>
-        <div class="ad" id="ad2"><img src="" alt="广告2"><a href=""></a></div>
-        <div class="ad" id="ad3"><img src="" alt="广告3"><a href=""></a></div>
+        <div class="ad" id="ad1"><a href=""><img src="" alt="广告1"></a></div>
+        <div class="ad" id="ad2"><a href=""><img src="" alt="广告2"></a></div>
+        <div class="ad" id="ad3"><a href=""><img src="" alt="广告3"></a></div>
     </div>
 
     <div class="footer dark-white">
@@ -43,6 +51,6 @@
         <div>Copyright © 2018-2025 example.com, All Rights Reserved</div>
     </div>
 
-    <canvas id="stars"></canvas> <!-- 粒子星空背景 -->
+    <canvas id="stars"></canvas>
 </body>
 </html>
