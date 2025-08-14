@@ -1,8 +1,11 @@
+let lastClick = 0;
+
 const modeSwitch = document.getElementById('modeSwitch');
 const editButton = document.getElementById('editButton');
+const passwordSubmit = document.getElementById('passwordSubmit');
 let timeout;
 
-function toggleModeSwitch() {
+function toggleButtons() {
     modeSwitch.classList.remove('hidden');
     editButton.classList.remove('hidden');
     clearTimeout(timeout);
@@ -17,18 +20,23 @@ if (modeSwitch) {
         document.body.classList.toggle('day-mode');
         modeSwitch.querySelector('.icon').textContent = document.body.classList.contains('day-mode') ? '🌙' : '☀️';
     });
-    window.addEventListener('scroll', toggleModeSwitch);
-    window.addEventListener('mousemove', toggleModeSwitch);
+    window.addEventListener('scroll', toggleButtons);
+    window.addEventListener('mousemove', toggleButtons);
 }
 
-if (editButton) {
+if (editButton && passwordSubmit) {
     editButton.addEventListener('click', () => {
+        const now = Date.now();
+        if (now - lastClick < 500) return;
+        lastClick = now;
         document.getElementById('passwordModal').style.display = 'block';
     });
+    passwordSubmit.addEventListener('click', checkPassword);
 }
 
 function checkPassword() {
     if (document.getElementById('passwordInput').value === '123456') {
+        document.getElementById('passwordModal').style.display = 'none';
         window.location.href = 'edit.html';
     } else {
         alert('密码错误');
@@ -41,30 +49,32 @@ if (canvas) {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
     let particles = [];
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 400; i++) {
         particles.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
-            r: Math.random() * 2 + 1,
-            speed: Math.random() * 0.5 + 0.1,
-            isMeteor: Math.random() < 0.1
+            r: Math.random() * 2.5 + 1,
+            speed: Math.random() * 0.4 + 0.1,
+            isMeteor: Math.random() < 0.2,
+            angle: Math.random() * Math.PI * 2
         });
     }
     function drawStars() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#fff';
-        ctx.strokeStyle = '#fff';
+        ctx.fillStyle = 'rgba(255,255,255,0.9)';
+        ctx.strokeStyle = 'rgba(102,204,255,1)';
         particles.forEach(p => {
             ctx.beginPath();
             if (p.isMeteor) {
                 ctx.moveTo(p.x, p.y);
-                ctx.lineTo(p.x - 20, p.y - 20);
+                ctx.lineTo(p.x - Math.cos(p.angle) * 40, p.y - Math.sin(p.angle) * 40);
                 ctx.stroke();
-                p.x += 2;
-                p.y += 2;
-                if (p.x > canvas.width || p.y > canvas.height) {
+                p.x += Math.cos(p.angle) * 4;
+                p.y += Math.sin(p.angle) * 4;
+                if (p.x > canvas.width || p.y > canvas.height || p.x < 0 || p.y < 0) {
                     p.x = Math.random() * canvas.width;
-                    p.y = -20;
+                    p.y = Math.random() * canvas.height;
+                    p.angle = Math.random() * Math.PI * 2;
                 }
             } else {
                 ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
@@ -94,9 +104,11 @@ function updateWidgets() {
     setInterval(updateTime, 1000);
 }
 function updateTime() {
-    const tz = document.getElementById('timeZone').value;
-    const time = new Date().toLocaleTimeString('zh-CN', { timeZone: tz });
-    document.getElementById('worldTime').firstChild.textContent = `世界时间: ${tz.split('/')[1]} - ${time}`;
+    const tz = document.getElementById('timeZone')?.value;
+    if (tz) {
+        const time = new Date().toLocaleTimeString('zh-CN', { timeZone: tz });
+        document.getElementById('worldTime').firstChild.textContent = `世界时间: ${tz.split('/')[1]} - ${time}`;
+    }
 }
 if (document.getElementById('uptime')) updateWidgets();
 
@@ -133,7 +145,7 @@ function renderBookmarks() {
 function renderAds() {
     for (let i = 1; i <= 3; i++) {
         const ad = document.getElementById(`ad${i}`);
-        ad.querySelector('img').src = ads[i-1].img || 'https://via.placeholder.com/300x100';
+        ad.querySelector('img').src = ads[i-1].img || 'https://via.placeholder.com/300x100?text=Ad+'+i;
         ad.querySelector('a').href = ads[i-1].link || '#';
     }
 }
@@ -144,6 +156,7 @@ if (document.getElementById('bookmarks')) {
 
 function renderEditor() {
     const editor = document.getElementById('bookmarkEditor');
+    if (!editor) return;
     editor.innerHTML = '';
     bookmarks.forEach((bm, idx) => {
         const div = document.createElement('div');
